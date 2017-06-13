@@ -97,14 +97,9 @@ void printMonsterData(Monster & monster){
 }
 
 void monsterSearch(){
-
 	 //The Monster object in JSON
 	json jsonList; //The list of all monsters from the external file
 	ifstream monsterlist("/home/jsteinberg/Documents/Projects/C++/dnd/json/5e-SRD-Monsters.json.txt");
-	if(!monsterlist) {
-		ofstream out("testdir.txt");
-		out << "test";
-	}
 	monsterlist >> jsonList;
 	string monsterSearch;
 	bool again = true; 
