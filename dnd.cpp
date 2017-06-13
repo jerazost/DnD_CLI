@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <map>
 #include <fstream>
+#include "Dice.h"
+#include "Ability.h"
+#include "Monster.h"
 
 //For case insensitive compares
 #include "lib/utility.cpp"
@@ -14,13 +18,15 @@
 using json = nlohmann::json;
 using namespace std;
 
-void findInJson(const string & name, const json & object, json &);
-void printMonsterData(const json & monsterData);
+void findInJson(const string &, const json &, Monster &);
+void printMonsterData(Monster &);
 void monsterSearch();
 int promptUser();
+string calculateModifiers(int);
+
+const char* FILE_PATH = "/home/jsteinberg/Documents/Projects/C++/dnd/";
 
 int main(){
-
 	//Main handles the states that the program is in
 	//The states are decided by the response in promptUser()
 	int state;
@@ -33,50 +39,58 @@ int main(){
 				cout << "Case " << state << " not recongnized" << endl;
 		}
 	}
-
 	return 0;
 }
 
-void findInJson(const string & name, const json & object, json & monster){
+void findInJson(const string & name, const json & object, Monster & monster){
 
-	for (int i = 0; i < object.size() - 1; i++){
+	for (size_t i = 0; i < object.size() - 1; i++){
 		if(icompare(object[i]["name"],name)){
-			monster = object[i];
+			monster = Monster(object[i]);
+			break;
 		}
 	}
 }
 
-void printMonsterData(const json & monsterData){
-	json temp;
+
+void printMonsterData(Monster & monster){
+	Ability* temp;
 
 	//Actions
-	if(monsterData.is_null()) {
+	if(monster.name == "") {
 		throw "No result for argument";
 	}
 
-	cout << " HP: " << monsterData["hit_points"]
-		<< " Armor Class: " << monsterData["armor_class"] << endl
-		<< " STR: " << monsterData["strength"]
-		<< " DEX: " << monsterData["dexterity"]
-		<< " CON: " << monsterData["constitution"]
-		<< " INT: " << monsterData["intelligence"]
-		<< " WIS: " << monsterData["wisdom"]
-		<< " CHA: " << monsterData["charisma"] << endl;
+	cout << " HP: " << monster.hit_points
+		<< " AC: " << monster.armor_class 
+		<< " CR: " << monster.challenge_rating << endl
+		<< " STR: " << monster.strength 
+			<< calculateModifiers(monster.strength) 
+		<< " DEX: " << monster.dexterity 
+			<< calculateModifiers(monster.dexterity) 
+		<< " CON: " << monster.constitution
+			<< calculateModifiers(monster.constitution) 
+		<< " INT: " << monster.intelligence 
+			<< calculateModifiers(monster.intelligence) 
+		<< " WIS: " << monster.wisdom
+			<< calculateModifiers(monster.wisdom) 
+		<< " CHA: " << monster.charisma
+			<< calculateModifiers(monster.charisma)
+		<< endl;
 
 	cout << "  Actions    " << endl;
-	json actions = monsterData["actions"];
-	for (int i = 0; i < actions.size(); i++)
+	for (size_t i = 0; i < monster.actions.size(); i++)
 	{
-		temp = actions[i];
-		if (temp["damage_dice"].is_null()) //The ability is not an attack
+		temp = monster.actions[i];
+		if (temp->damage_dice.name == "") //The ability is not an attack
 		{
-			cout << "  " << temp["name"] << ": "
-				<< temp["desc"] << endl << endl;
+			cout << "  " << temp->name << ": "
+				<< temp->description << endl << endl;
 		}else{	//The ability is an attack
-			cout << "  " << temp["name"] << ": Hit Bonus: " 
-				<< "+ " << temp["attack_bonus"]
-				<< " Damage: " << temp["damage_dice"]
-				<< " + " << temp["damage_bonus"] << endl;
+			cout << "  " << temp->name << ": Hit Bonus: " 
+				<< "+ " << temp->attack_bonus
+				<< " Damage: " << temp->damage_dice.name
+				<< " + " << temp->damage_bonus << endl;
 		}
 	}
 	cout << endl;
@@ -86,13 +100,16 @@ void monsterSearch(){
 
 	 //The Monster object in JSON
 	json jsonList; //The list of all monsters from the external file
-	
-	ifstream monsterlist("json/5e-SRD-Monsters.json.txt");
+	ifstream monsterlist("/home/jsteinberg/Documents/Projects/C++/dnd/json/5e-SRD-Monsters.json.txt");
+	if(!monsterlist) {
+		ofstream out("testdir.txt");
+		out << "test";
+	}
 	monsterlist >> jsonList;
 	string monsterSearch;
 	bool again = true; 
 	do{
-		json monster;
+		Monster monster;
 		cout  << endl << "Give me the name of a monster" << endl << endl;
 		getline(cin, monsterSearch);
 		try{
@@ -117,17 +134,25 @@ int promptUser(){
 	
 	int response;
 
-	cout << "Welcome to DM CLI Tools" << endl;
+	cout << " Welcome to DM CLI Tools" << endl;
 	cout << "   1. Monster Stats" << endl;
 	cout << "   2. Encounters " << endl;
 	cout << "   3. Party Manager" << endl;
 	cout << "   4. Exit" << endl;
+	cout << " ";
 
 	cin >> response;
 	cin.ignore();
 
 	return response;
 }
-
-
-
+string calculateModifiers(int ability_score){
+	stringstream stringModifier;
+	int mod = (ability_score - 10) / 2;
+	if(mod >= 0){
+		stringModifier << "(+" << mod << ")"; 
+	}else{
+		stringModifier << "(" << mod << ")";
+	}
+	return stringModifier.str();
+}
