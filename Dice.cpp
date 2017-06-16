@@ -16,7 +16,11 @@ Dice::Dice(const std::string & diceString){
 		name = diceString;
 		size_t d = diceString.find("d");
 		diceType = std::stoi(diceString.substr(d + 1));
-		multiplier = std::stoi(diceString.substr(0,d));
+		if (diceString.substr(0,d) == "") {
+			multiplier = 1;
+		} else {
+			multiplier = std::stoi(diceString.substr(0,d));
+		}
 	} catch (const std::invalid_argument& ia) {
 		cout << "Invalid dice, format: [amount]d[maximum]" << endl;
 	}

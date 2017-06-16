@@ -185,8 +185,9 @@ void rollDice() {
 			int result = d.roll();
 			if (result != 0) {
 				cout << "Your roll was: " << result << endl;
+			} if (result != 0) {
+				saveDice(result, die);
 			}
-			saveDice(result, die);
 		} cout << endl << "Type EXIT to return to menu." << endl;
 	} while (again);
 }
