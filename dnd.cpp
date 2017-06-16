@@ -163,16 +163,14 @@ void rollDice() {
 	do {
 		cout << "Enter a die to roll: ";
 		cin >> die;
-		try {
-			if (die == "EXIT" || die == "exit") {
-				again = false;
-			} else {
-				Dice d(die);
-				int result = d.roll();
+		if (die == "EXIT" || die == "exit") {
+			again = false;
+		} else {
+			Dice d(die);
+			int result = d.roll();
+			if (result != 0) {
 				cout << "Your roll was: " << result << endl;
 			}
-		} catch (const char*) {
-			cout << "Invalid dice, format: [amount]d[maximum]" << endl;
 		} cout << endl << "Type EXIT to return to menu." << endl;
 	} while (again);
 }
