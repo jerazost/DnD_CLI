@@ -27,7 +27,7 @@ void getHistory();
 int promptUser();
 string calculateModifiers(int);
 
-const char* FILE_PATH = "/home/korekim/Documents/DnD_CLI/json/5e-SRD-Monsters.json.txt";
+const char* FILE_PATH = "./json/5e-SRD-Monsters.json.txt";
 
 int main(){
 	//Main handles the states that the program is in
@@ -200,7 +200,7 @@ void getHistory() {
 	while (getline(history, str)) {
 		data.push_back(str);
 	}
-	for (int i; i < data.size(); i++) {
+	for (size_t i; i < data.size(); i++) {
 		if (data[0] == "") {
 			cout << "NO ROLL HISTORY.\n";
 		} else {
