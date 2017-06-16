@@ -1,6 +1,6 @@
 #include "Dice.h"
 //DEBUG
-#include <iostream> 
+#include <iostream>
 using namespace std;
 
 Dice::Dice(){

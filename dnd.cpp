@@ -21,19 +21,23 @@ using namespace std;
 void findInJson(const string &, const json &, Monster &);
 void printMonsterData(Monster &);
 void monsterSearch();
+void rollDice();
 int promptUser();
 string calculateModifiers(int);
 
-const char* FILE_PATH = "/home/jsteinberg/Documents/Projects/C++/dnd/";
+const char* FILE_PATH = "/home/korekim/Documents/DnD_CLI/json/5e-SRD-Monsters.json.txt";
 
 int main(){
 	//Main handles the states that the program is in
 	//The states are decided by the response in promptUser()
 	int state;
-	while((state = promptUser()) != 4) {
+	while((state = promptUser()) != 5) {
 		switch(state){
-			case 1: 
+			case 1:
 				monsterSearch();
+				break;
+			case 4:
+				rollDice();
 				break;
 			default:
 				cout << "Case " << state << " not recongnized" << endl;
@@ -62,18 +66,18 @@ void printMonsterData(Monster & monster){
 	}
 
 	cout << " HP: " << monster.hit_points
-		<< " AC: " << monster.armor_class 
+		<< " AC: " << monster.armor_class
 		<< " CR: " << monster.challenge_rating << endl
-		<< " STR: " << monster.strength 
-			<< calculateModifiers(monster.strength) 
-		<< " DEX: " << monster.dexterity 
-			<< calculateModifiers(monster.dexterity) 
+		<< " STR: " << monster.strength
+			<< calculateModifiers(monster.strength)
+		<< " DEX: " << monster.dexterity
+			<< calculateModifiers(monster.dexterity)
 		<< " CON: " << monster.constitution
-			<< calculateModifiers(monster.constitution) 
-		<< " INT: " << monster.intelligence 
-			<< calculateModifiers(monster.intelligence) 
+			<< calculateModifiers(monster.constitution)
+		<< " INT: " << monster.intelligence
+			<< calculateModifiers(monster.intelligence)
 		<< " WIS: " << monster.wisdom
-			<< calculateModifiers(monster.wisdom) 
+			<< calculateModifiers(monster.wisdom)
 		<< " CHA: " << monster.charisma
 			<< calculateModifiers(monster.charisma)
 		<< endl;
@@ -87,7 +91,7 @@ void printMonsterData(Monster & monster){
 			cout << "  " << temp->name << ": "
 				<< temp->description << endl << endl;
 		}else{	//The ability is an attack
-			cout << "  " << temp->name << ": Hit Bonus: " 
+			cout << "  " << temp->name << ": Hit Bonus: "
 				<< "+ " << temp->attack_bonus
 				<< " Damage: " << temp->damage_dice.name
 				<< " + " << temp->damage_bonus << endl;
@@ -99,10 +103,10 @@ void printMonsterData(Monster & monster){
 void monsterSearch(){
 	 //The Monster object in JSON
 	json jsonList; //The list of all monsters from the external file
-	ifstream monsterlist("/home/jsteinberg/Documents/Projects/C++/dnd/json/5e-SRD-Monsters.json.txt");
+	ifstream monsterlist(FILE_PATH);
 	monsterlist >> jsonList;
 	string monsterSearch;
-	bool again = true; 
+	bool again = true;
 	do{
 		Monster monster;
 		cout  << endl << "Give me the name of a monster" << endl << endl;
@@ -126,14 +130,15 @@ void monsterSearch(){
 }
 
 int promptUser(){
-	
+
 	int response;
 
 	cout << " Welcome to DM CLI Tools" << endl;
 	cout << "   1. Monster Stats" << endl;
 	cout << "   2. Encounters " << endl;
 	cout << "   3. Party Manager" << endl;
-	cout << "   4. Exit" << endl;
+	cout << "   4. Dice Roller " << endl;
+	cout << "   5. Exit" << endl;
 	cout << " ";
 
 	cin >> response;
@@ -145,9 +150,47 @@ string calculateModifiers(int ability_score){
 	stringstream stringModifier;
 	int mod = (ability_score - 10) / 2;
 	if(mod >= 0){
-		stringModifier << "(+" << mod << ")"; 
+		stringModifier << "(+" << mod << ")";
 	}else{
 		stringModifier << "(" << mod << ")";
 	}
 	return stringModifier.str();
 }
+
+void rollDice() {
+	string die;
+	bool again = true;
+	do {
+		cout << "Enter a die to roll: ";
+		cin >> die;
+		try {
+			if (die == "EXIT" || die == "exit") {
+				again = false;
+			} else {
+				Dice d(die);
+				int result = d.roll();
+				cout << "Your roll was: " << result << endl;
+			}
+		} catch (const char*) {
+			cout << "Invalid dice, format: [amount]d[maximum]" << endl;
+		} cout << endl << "Type EXIT to return to menu." << endl;
+	} while (again);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
