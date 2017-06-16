@@ -22,6 +22,8 @@ void findInJson(const string &, const json &, Monster &);
 void printMonsterData(Monster &);
 void monsterSearch();
 void rollDice();
+void saveData(int, string);
+void getHistory();
 int promptUser();
 string calculateModifiers(int);
 
@@ -31,13 +33,16 @@ int main(){
 	//Main handles the states that the program is in
 	//The states are decided by the response in promptUser()
 	int state;
-	while((state = promptUser()) != 5) {
+	while((state = promptUser()) != 6) {
 		switch(state){
 			case 1:
 				monsterSearch();
 				break;
 			case 4:
 				rollDice();
+				break;
+			case 5:
+				getHistory();
 				break;
 			default:
 				cout << "Case " << state << " not recongnized" << endl;
@@ -138,7 +143,8 @@ int promptUser(){
 	cout << "   2. Encounters " << endl;
 	cout << "   3. Party Manager" << endl;
 	cout << "   4. Dice Roller " << endl;
-	cout << "   5. Exit" << endl;
+	cout << "   5. View Dice History " << endl;
+	cout << "   6. Exit" << endl;
 	cout << " ";
 
 	cin >> response;
@@ -157,6 +163,15 @@ string calculateModifiers(int ability_score){
 	return stringModifier.str();
 }
 
+void saveDice(int roll, string die) {
+	ofstream history;
+	history.open("dice-history.txt", fstream::app);
+	history << die;
+	history << ": ";
+	history << roll << endl;
+	history.close();
+}
+
 void rollDice() {
 	string die;
 	bool again = true;
@@ -171,16 +186,27 @@ void rollDice() {
 			if (result != 0) {
 				cout << "Your roll was: " << result << endl;
 			}
+			saveDice(result, die);
 		} cout << endl << "Type EXIT to return to menu." << endl;
 	} while (again);
 }
 
-
-
-
-
-
-
+void getHistory() {
+	cout << "\nROLL HISTORY:\n";
+	string str;
+	vector<string> data;
+	ifstream history("dice-history.txt");
+	while (getline(history, str)) {
+		data.push_back(str);
+	}
+	for (int i; i < data.size(); i++) {
+		if (data[0] == "") {
+			cout << "NO ROLL HISTORY.\n";
+		} else {
+		cout << data[i] << endl;
+	}
+	}cout << endl;
+}
 
 
 
